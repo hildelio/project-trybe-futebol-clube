@@ -14,4 +14,4 @@ EXPOSE 3000
 # Dica: Leia a seção Docker e Docker-compose no README para mais informações
 ENTRYPOINT [ "npm", "run" ]
 
-CMD [ "dev" ]
+CMD [ "start" ]
