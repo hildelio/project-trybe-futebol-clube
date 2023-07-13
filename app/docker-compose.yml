@@ -2,7 +2,11 @@ version: '3.9'
 services:
   frontend:
     container_name: app_frontend
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - BUILD_TIMEOUT=600
     ports:
       - 3000:3000
     working_dir: /app-frontend
@@ -10,18 +14,22 @@ services:
     # está operacional, antes de liberar o container
     healthcheck:
       test: ["CMD", "lsof", "-t", "-i:3000"]  # Caso utilize outra porta interna para o front, altere ela aqui também
-      timeout: 10s
+      timeout: 60s
       retries: 5
   backend:
     container_name: app_backend
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        - BUILD_TIMEOUT=600
     ports:
       - 3001:3001
     working_dir: /app-backend
     # Caso queira que o container esteja atualizado durante o desenvolvimento, sem que você precise ficar fazendo down e up dos containers, descomente as 3 linhas abaixo
-    # command: dev 
-    # volumes: 
-    #   - ./backend/src:/app-backend/src
+    command: dev 
+    volumes: 
+      - ./backend/src:/app-backend/src
     depends_on:
       db:
         condition: service_healthy
@@ -36,7 +44,7 @@ services:
       - DB_PORT=3306
     healthcheck:
       test: ["CMD", "lsof", "-t", "-i:3001"] # Caso utilize outra porta interna para o back, altere ela aqui também
-      timeout: 10s
+      timeout: 60s
       retries: 5
   db:
     image: mysql:8.0.32
