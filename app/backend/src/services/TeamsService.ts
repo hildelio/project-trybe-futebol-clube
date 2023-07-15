@@ -2,6 +2,7 @@ import TeamsModel from '../models/TeamsModel';
 import ServiceResponse from '../Interfaces/IServiceResponse';
 import ITeams from '../Interfaces/teams/ITeams';
 import httpStatus from '../utils/httpStatus';
+import CustomError from '../utils/CustomError';
 
 export default class TeamsService {
   private teamsModel: TeamsModel;
@@ -11,15 +12,18 @@ export default class TeamsService {
   }
 
   async findAll(): Promise<ServiceResponse<ITeams[]>> {
-    try {
-      const teams = await this.teamsModel.findAll();
-      return { type: httpStatus.ok, message: 'Success', data: { value: teams } };
-    } catch (error) { // estudar como tratar erros
-      return {
-        type: httpStatus.internalServerError,
-        message: 'Internal Server Error',
-        data: { value: null },
-      };
+    const teams = await this.teamsModel.findAll();
+    if (!teams) {
+      throw new CustomError('Teams not founded', httpStatus.notFound);
     }
+    return { type: httpStatus.ok, message: 'Success', data: { value: teams } };
+  }
+
+  async findById(id: number): Promise<ServiceResponse<ITeams | null>> {
+    const team = await this.teamsModel.findById(id);
+    if (!team) {
+      throw new CustomError('Team not founded', httpStatus.notFound);
+    }
+    return { type: httpStatus.ok, message: 'Success', data: { value: team } };
   }
 }

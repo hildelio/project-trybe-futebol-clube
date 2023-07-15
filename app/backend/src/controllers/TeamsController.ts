@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import TeamsService from '../services/TeamsService';
-import { response, responseWithData } from '../utils/handleResponse';
+import { responseWithData } from '../utils/handleResponse';
 
 export default class TeamsController {
   private teamsService: TeamsService;
@@ -8,12 +8,22 @@ export default class TeamsController {
     this.teamsService = new TeamsService();
   }
 
-  public async findAll(req: Request, res: Response): Promise<Response> {
+  public async findAll(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
-      const { type, message, data: { value } } = await this.teamsService.findAll();
-      return responseWithData(res, { type, message, data: { value } });
-    } catch (error) { // estudar como tratar erros
-      return response(res, { type: 500, message: 'Internal Server Error', data: { value: null } });
+      const teamsResponse = await this.teamsService.findAll();
+      return responseWithData(res, teamsResponse);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public async findById(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    try {
+      const { id } = req.params;
+      const teamResponse = await this.teamsService.findById(+id);
+      return responseWithData(res, teamResponse);
+    } catch (error) {
+      next(error);
     }
   }
 }
