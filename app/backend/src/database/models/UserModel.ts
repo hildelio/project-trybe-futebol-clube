@@ -10,8 +10,8 @@ import db from '.';
 class SequelizeUser extends
   Model<InferAttributes<SequelizeUser>, InferCreationAttributes<SequelizeUser>> {
   declare id: CreationOptional<number>;
-  declare username: CreationOptional<string>;
-  declare role: CreationOptional<string>;
+  declare username: string;
+  declare role: string;
   declare email: string;
   declare password: string;
 }
@@ -26,9 +26,11 @@ SequelizeUser.init(
     },
     username: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
     role: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
     email: {
       type: DataTypes.STRING,

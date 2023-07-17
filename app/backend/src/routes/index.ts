@@ -6,6 +6,6 @@ import loginRouter from './loginRouter';
 const router = Router();
 
 router.use('/teams', handleError, teamsRouter);
-router.use('/login', handleError, loginRouter);
+router.use('/login', loginRouter);
 
 export default router;

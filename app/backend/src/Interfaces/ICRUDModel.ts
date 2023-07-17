@@ -7,7 +7,7 @@ export interface ICRUDModelCreator<T> {
 export interface ICRUDModelReader<T> {
   findAll?(): Promise<T[]>,
   findById?(id: ID): Promise<T | null>,
-  findOne?(data: Partial<T>): Promise<T | null>,
+  findOne?(email: string): Promise<T | null>,
 }
 
 export interface ICRUDModelUpdater<T> {
