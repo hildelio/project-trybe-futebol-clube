@@ -30,6 +30,14 @@ describe('Class App', () => {
     expect(start).to.be.ok;
   })
 
+  it('Verifica se ao acessar a rota /teams deve retornar 404 em caso de erro', async function() {
+    sinon.stub(TeamsModel.prototype, 'findAll').resolves(undefined);
+
+    const {status, body} = await chai.request(app).get('/teams');
+    expect(status).to.be.equal(404);
+    expect(body).to.be.deep.equal({message: 'Teams not founded'});
+  })
+
   it('Verifica se acessa a rota /teams com sucesso', async function() {
 
     sinon.stub(TeamsModel.prototype, 'findAll').resolves(teamsMock);
@@ -38,7 +46,15 @@ describe('Class App', () => {
     expect(status).to.be.equal(200);
     expect(body).to.be.deep.equal(teamsMock);
   })
+  
+  it('Verifica se ao acessar a rota /teams/:id deve retornar 404 em caso de erro', async function() {
+    sinon.stub(TeamsModel.prototype, 'findById').resolves(null);
 
+    const {status, body} = await chai.request(app).get('/teams/9999');
+    expect(status).to.be.equal(404);
+    expect(body).to.be.deep.equal({message: 'Team not founded'});
+  })
+  
   it('Verifica se acessa a rota /teams/:id com sucesso', async function() {
 
     sinon.stub(TeamsModel.prototype, 'findById').resolves(teamMock);
