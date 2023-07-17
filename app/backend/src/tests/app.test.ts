@@ -18,7 +18,7 @@ const { expect } = chai;
 const { app, start } = new App();
 
 describe('Class App', () => {
-  beforeEach(() => {
+  afterEach(() => {
     sinon.restore();
   })
 
@@ -31,9 +31,8 @@ describe('Class App', () => {
   })
 
   it('Verifica se acessa a rota /teams com sucesso', async function() {
-    const teamsModelInstance = new TeamsModel();
 
-    sinon.stub(teamsModelInstance, 'findAll').resolves(teamsMock);
+    sinon.stub(TeamsModel.prototype, 'findAll').resolves(teamsMock);
 
     const {status, body} = await chai.request(app).get('/teams');
     expect(status).to.be.equal(200);
@@ -41,9 +40,8 @@ describe('Class App', () => {
   })
 
   it('Verifica se acessa a rota /teams/:id com sucesso', async function() {
-    const teamsModelInstance = new TeamsModel();
 
-    sinon.stub(teamsModelInstance, 'findById').resolves(teamMock);
+    sinon.stub(TeamsModel.prototype, 'findById').resolves(teamMock);
 
     const {status, body} = await chai.request(app).get('/teams/12');
     expect(status).to.be.equal(200);

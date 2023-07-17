@@ -19,7 +19,7 @@ export default class TeamsService {
     return { type: httpStatus.ok, message: 'Success', data: { value: teams } };
   }
 
-  async findById(id: number): Promise<ServiceResponse<ITeams | null>> {
+  async findById(id: number): Promise<ServiceResponse<ITeams>> {
     const team = await this.teamsModel.findById(id);
     if (!team) {
       throw new CustomError('Team not founded', httpStatus.notFound);

@@ -1,5 +1,5 @@
 import { Secret } from 'jsonwebtoken';
-import jwt = require('jsonwebtoken');
+import * as jwt from 'jsonwebtoken';
 
 const SECRET: Secret = process.env.JWT_SECRET || 'you-shall-not-pass';
 

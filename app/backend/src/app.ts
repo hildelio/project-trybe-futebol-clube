@@ -1,5 +1,6 @@
 import * as express from 'express';
 import router from './routes';
+import handleError from './middlewares/handleError';
 
 class App {
   public app: express.Express;
@@ -10,7 +11,8 @@ class App {
     this.config();
 
     // this.routes();
-
+    this.app.use(router);
+    this.app.use(handleError);
     // Não remover essa rota
     this.app.get('/', (req, res) => res.json({ ok: true }));
   }
@@ -25,7 +27,6 @@ class App {
 
     this.app.use(express.json());
     this.app.use(accessControl);
-    this.app.use(router);
   }
 
   // private routes(): void {

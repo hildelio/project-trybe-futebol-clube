@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ValidationError } from 'joi';
-import Joi = require('joi');
+import * as Joi from 'joi';
 import { decodedToken } from '../utils/tokenJWT';
 
 const tokenSchema = Joi.string().required().messages({

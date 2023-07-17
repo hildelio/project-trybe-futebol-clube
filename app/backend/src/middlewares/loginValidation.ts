@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ValidationError } from 'joi';
-import Joi = require('joi');
+import * as Joi from 'joi';
 
 const loginSchema = Joi.object({
   email: Joi.string().email().required(),
