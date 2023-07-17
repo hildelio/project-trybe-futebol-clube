@@ -1,0 +1,4 @@
+joi
+@types/jsonwebtoken
+jsonwebtoken
+bcrypt
