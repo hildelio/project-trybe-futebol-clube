@@ -8,8 +8,9 @@ import { App } from '../app';
 import { Response } from 'superagent';
 import TeamsModel from '../models/TeamsModel';
 import teamsMock from './mocks/teamsMock';
-import teamsRouter from '../routes/teamsRouter';
 import teamMock from './mocks/teamMock';
+import LoginModel from '../models/LoginModel';
+import httpStatus from '../utils/httpStatus';
 
 chai.use(chaiHttp);
 
@@ -34,7 +35,7 @@ describe('Class App', () => {
     sinon.stub(TeamsModel.prototype, 'findAll').resolves(undefined);
 
     const {status, body} = await chai.request(app).get('/teams');
-    expect(status).to.be.equal(404);
+    expect(status).to.be.equal(httpStatus.notFound);
     expect(body).to.be.deep.equal({message: 'Teams not founded'});
   })
 
@@ -43,7 +44,7 @@ describe('Class App', () => {
     sinon.stub(TeamsModel.prototype, 'findAll').resolves(teamsMock);
 
     const {status, body} = await chai.request(app).get('/teams');
-    expect(status).to.be.equal(200);
+    expect(status).to.be.equal(httpStatus.ok);
     expect(body).to.be.deep.equal(teamsMock);
   })
   
@@ -51,7 +52,7 @@ describe('Class App', () => {
     sinon.stub(TeamsModel.prototype, 'findById').resolves(null);
 
     const {status, body} = await chai.request(app).get('/teams/9999');
-    expect(status).to.be.equal(404);
+    expect(status).to.be.equal(httpStatus.notFound);
     expect(body).to.be.deep.equal({message: 'Team not founded'});
   })
   
@@ -60,7 +61,16 @@ describe('Class App', () => {
     sinon.stub(TeamsModel.prototype, 'findById').resolves(teamMock);
 
     const {status, body} = await chai.request(app).get('/teams/12');
-    expect(status).to.be.equal(200);
+    expect(status).to.be.equal(httpStatus.ok);
     expect(body).to.be.deep.equal(teamMock);
+  })
+
+  it.skip('Verifica se ao acessar a rota /login com email inválido retorna erro 401', async function() {
+
+    sinon.stub(LoginModel.prototype, 'findOne').resolves(null);
+
+    const {status, body} = await chai.request(app).get('/login');
+    expect(status).to.be.equal(httpStatus.unauthorized);
+    expect(body).to.be.deep.equal({ message: 'Invalid email or password'});
   })
 });
