@@ -9,4 +9,9 @@ export default class LoginModel implements IUserModel {
     const User = await this.model.findOne({ where: { email }, plain: true });
     return User || null;
   }
+
+  async findById(id: number): Promise<IUser | null> {
+    const User = await this.model.findByPk(id);
+    return User || null;
+  }
 }

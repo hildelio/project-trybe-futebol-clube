@@ -5,6 +5,7 @@ const SECRET: Secret = process.env.JWT_SECRET || 'you-shall-not-pass';
 
 type TokenPayload = {
   id: number;
+  role: string;
 };
 
 export const tokenGenerator = (payload: TokenPayload): string =>

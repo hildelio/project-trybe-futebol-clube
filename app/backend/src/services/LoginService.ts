@@ -29,7 +29,7 @@ export default class LoginService {
 
     if (!passwordMatch) return unauthorized;
 
-    const token = tokenGenerator({ id: response.id });
+    const token = tokenGenerator({ id: response.id, role: response.role });
     return { type: httpStatus.ok, message: 'Success', data: { token } };
   }
 }

@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import ServiceResponse from '../Interfaces/IServiceResponse';
 
-const response = <T>(res: Response, payload: ServiceResponse<T>): Response => {
+const responseWithMessage = <T>(res: Response, payload: ServiceResponse<T>): Response => {
   const { type, message } = payload;
   if (type > 300) {
     return res.status(type).json({ message });
@@ -34,7 +34,7 @@ const responseWithoutMessage = <T>(res: Response, payload: ServiceResponse<T>): 
 };
 
 export {
-  response,
+  responseWithMessage,
   responseWithData,
   responseWithToken,
   responseWithoutMessage,

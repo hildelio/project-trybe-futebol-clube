@@ -3,6 +3,6 @@ export default interface ServiceResponse<T> {
   message: string,
   data: {
     token?: string,
-    value?: null | T
+    value?: null | T | string
   }
 }
