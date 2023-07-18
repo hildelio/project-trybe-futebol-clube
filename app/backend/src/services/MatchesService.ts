@@ -34,4 +34,24 @@ export default class MatchesService {
       throw new CustomError('Error retrieving matches', httpStatus.internalServerError);
     }
   }
+
+  async finish(id: number): Promise<ServiceResponse<IMatches>> {
+    try {
+      const matchToUpdate = await this.matchesModel.findById(id);
+
+      if (!matchToUpdate) {
+        throw new CustomError('Match not found', httpStatus.notFound);
+      }
+
+      matchToUpdate.inProgress = false;
+      await matchToUpdate.save();
+      return {
+        type: httpStatus.ok,
+        message: 'Finished',
+        data: { value: matchToUpdate },
+      };
+    } catch (error) {
+      throw new CustomError('Error finishing match', httpStatus.internalServerError);
+    }
+  }
 }

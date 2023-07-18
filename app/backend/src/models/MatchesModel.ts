@@ -10,4 +10,9 @@ export default class MatchesModel implements IMatchesModel {
     const matches = await this.model.findAll(options);
     return matches;
   }
+
+  async findById(id: number): Promise<SequelizeMatch | null> {
+    const match = await this.model.findByPk(id);
+    return match;
+  }
 }

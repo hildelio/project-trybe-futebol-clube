@@ -11,6 +11,8 @@ import teamsMock from './mocks/teamsMock';
 import teamMock from './mocks/teamMock';
 import LoginModel from '../models/LoginModel';
 import httpStatus from '../utils/httpStatus';
+import MatchesModel from '../models/MatchesModel';
+import AllMatchesMock from './mocks/allMatchesMock';
 
 chai.use(chaiHttp);
 
@@ -72,5 +74,14 @@ describe('Class App', () => {
     const {status, body} = await chai.request(app).get('/login');
     expect(status).to.be.equal(httpStatus.unauthorized);
     expect(body).to.be.deep.equal({ message: 'Invalid email or password'});
+  })
+
+  it('Verifica se acessa a rota /matches com sucesso', async function() {
+
+    sinon.stub(MatchesModel.prototype, 'findAll').resolves(AllMatchesMock);
+
+    const {status, body} = await chai.request(app).get('/matches');
+    expect(status).to.be.equal(httpStatus.ok);
+    expect(body).to.be.deep.equal(AllMatchesMock);
   })
 });

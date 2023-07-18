@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import MatchesController from '../controllers/MatchesController';
+import { hasToken, tokenValidation } from '../middlewares/tokenValidation';
 
 const matchesRouter = Router();
 
@@ -10,6 +11,13 @@ matchesRouter.get('/', (req, res, next) => matchesController.findAll(req, res, n
 matchesRouter.get(
   '/?inProgress=true',
   (req, res, next) => matchesController.findAll(req, res, next),
+);
+
+matchesRouter.patch(
+  '/:id/finish',
+  hasToken,
+  tokenValidation,
+  (req, res, next) => matchesController.finish(req, res, next),
 );
 
 export default matchesRouter;

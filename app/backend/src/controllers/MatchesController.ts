@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { responseWithData } from '../utils/handleResponse';
+import { responseWithData, responseWithMessage } from '../utils/handleResponse';
 import MatchesService from '../services/MatchesService';
 
 export default class MatchesController {
@@ -25,6 +25,16 @@ export default class MatchesController {
       }
       const matchesResponse = await this.matchesService.findAll(inProgress);
       return responseWithData(res, matchesResponse);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public async finish(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    try {
+      const { id } = req.params;
+      const matchesResponse = await this.matchesService.finish(+id);
+      return responseWithMessage(res, matchesResponse);
     } catch (error) {
       next(error);
     }
