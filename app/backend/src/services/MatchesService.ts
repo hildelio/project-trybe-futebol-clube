@@ -54,4 +54,25 @@ export default class MatchesService {
       throw new CustomError('Error finishing match', httpStatus.internalServerError);
     }
   }
+
+  async updateScore(
+    id: number,
+    homeTeamGoals: number,
+    awayTeamGoals: number,
+  ): Promise<ServiceResponse<IMatches>> {
+    try {
+      const matchToUpdate = await this.matchesModel.findById(id);
+      if (!matchToUpdate) {
+        throw new CustomError('Match not found', httpStatus.notFound);
+      }
+      matchToUpdate.homeTeamGoals = homeTeamGoals;
+      matchToUpdate.awayTeamGoals = awayTeamGoals;
+      await matchToUpdate.save();
+      return {
+        type: httpStatus.ok, message: 'Updated score', data: { value: matchToUpdate },
+      };
+    } catch (error) {
+      throw new CustomError('Error updating score', httpStatus.internalServerError);
+    }
+  }
 }

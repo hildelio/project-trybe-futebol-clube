@@ -20,4 +20,11 @@ matchesRouter.patch(
   (req, res, next) => matchesController.finish(req, res, next),
 );
 
+matchesRouter.patch(
+  '/:id',
+  hasToken,
+  tokenValidation,
+  (req, res, next) => matchesController.updateScore(req, res, next),
+);
+
 export default matchesRouter;
