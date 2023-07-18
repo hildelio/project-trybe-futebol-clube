@@ -2,3 +2,4 @@ joi
 @types/jsonwebtoken
 jsonwebtoken
 bcrypt
+express-async-errors

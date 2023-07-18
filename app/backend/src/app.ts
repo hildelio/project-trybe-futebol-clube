@@ -1,6 +1,9 @@
 import * as express from 'express';
 import router from './routes';
+
 import handleError from './middlewares/handleError';
+
+require('express-async-errors');
 
 class App {
   public app: express.Express;
