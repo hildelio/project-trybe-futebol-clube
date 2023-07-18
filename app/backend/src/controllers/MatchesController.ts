@@ -10,7 +10,20 @@ export default class MatchesController {
 
   public async findAll(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
-      const matchesResponse = await this.matchesService.findAll();
+      let inProgress;
+
+      switch (req.query.inProgress) {
+        case 'true':
+          inProgress = true;
+          break;
+        case 'false':
+          inProgress = false;
+          break;
+        default:
+          inProgress = undefined;
+          break;
+      }
+      const matchesResponse = await this.matchesService.findAll(inProgress);
       return responseWithData(res, matchesResponse);
     } catch (error) {
       next(error);

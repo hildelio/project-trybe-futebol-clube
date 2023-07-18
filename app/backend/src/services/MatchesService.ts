@@ -12,15 +12,18 @@ export default class MatchesService {
     this.matchesModel = new MatchesModel();
   }
 
-  async findAll(): Promise<ServiceResponse<IMatches[]>> {
+  async findAll(inProgress?: boolean): Promise<ServiceResponse<IMatches[]>> {
     try {
-      const matches = await this.matchesModel.findAll({
+      let matches = await this.matchesModel.findAll({
         include: [
           { model: SequelizeTeam, as: 'homeTeam', attributes: { exclude: ['id'] } },
           { model: SequelizeTeam, as: 'awayTeam', attributes: { exclude: ['id'] } },
         ],
-        attributes: { exclude: [] },
-      });
+        attributes: { exclude: [] } });
+
+      if (typeof inProgress === 'boolean') {
+        matches = matches.filter((match) => match.inProgress === inProgress);
+      }
 
       return {
         type: httpStatus.ok,
