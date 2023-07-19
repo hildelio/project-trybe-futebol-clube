@@ -1,4 +1,4 @@
-import { ICRUDModelReader } from '../ICRUDModel';
+import { ICRUDModelReader, ICRUDModelCreator } from '../ICRUDModel';
 import IMatches from './IMatches';
 
-export type IMatchesModel = ICRUDModelReader<IMatches>;
+export interface IMatchesModel extends ICRUDModelReader<IMatches>, ICRUDModelCreator<IMatches> {}

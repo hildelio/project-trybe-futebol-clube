@@ -75,4 +75,25 @@ export default class MatchesService {
       throw new CustomError('Error updating score', httpStatus.internalServerError);
     }
   }
+
+  async create({ homeTeamId, awayTeamId, homeTeamGoals, awayTeamGoals }: IMatches):
+  Promise<ServiceResponse<IMatches>> {
+    try {
+      const data = {
+        homeTeamId,
+        homeTeamGoals,
+        awayTeamId,
+        awayTeamGoals,
+        inProgress: true,
+      };
+      const newMatch = await this.matchesModel.create(data);
+      return {
+        type: httpStatus.created,
+        message: 'Created',
+        data: { value: newMatch },
+      };
+    } catch (error) {
+      throw new CustomError('Error creating match', httpStatus.internalServerError);
+    }
+  }
 }

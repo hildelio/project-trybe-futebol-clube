@@ -52,4 +52,13 @@ export default class MatchesController {
       next(error);
     }
   }
+
+  public async create(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    try {
+      const matchesResponse = await this.matchesService.create(req.body);
+      return responseWithData(res, matchesResponse);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

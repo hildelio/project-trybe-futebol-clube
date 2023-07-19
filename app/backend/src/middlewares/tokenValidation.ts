@@ -28,6 +28,7 @@ export const tokenValidation = async (req: Request, res: Response, next: NextFun
 Promise<Response | void> => {
   const { authorization } = req.headers;
   const [, token] = authorization?.split(' ') || [];
+  // const token = authorization as string;
   try {
     decodedToken(token);
     return next();

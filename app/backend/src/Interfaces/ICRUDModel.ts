@@ -1,7 +1,8 @@
+import { CreateOptions } from 'sequelize';
 import { ID } from './index';
 
 export interface ICRUDModelCreator<T> {
-  create(data: Partial<T>): Promise<T>,
+  create(data: Partial<T>, options?: CreateOptions): Promise<T>,
 }
 
 export interface ICRUDModelReader<T> {
