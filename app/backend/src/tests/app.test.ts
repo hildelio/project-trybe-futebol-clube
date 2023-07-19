@@ -13,6 +13,9 @@ import LoginModel from '../models/LoginModel';
 import httpStatus from '../utils/httpStatus';
 import MatchesModel from '../models/MatchesModel';
 import AllMatchesMock from './mocks/allMatchesMock';
+import loginMock from './mocks/loginMock';
+import userMock from './mocks/userMock';
+import tokenMock from './mocks/tokenMock';
 
 chai.use(chaiHttp);
 
@@ -24,6 +27,9 @@ describe('Class App', () => {
   afterEach(() => {
     sinon.restore();
   })
+
+  const req = { body: {}};
+  const res = {};
 
   it('Verifica se existe a classe App', () => {
     expect(app).to.be.ok;
@@ -75,9 +81,16 @@ describe('Class App', () => {
     expect(status).to.be.equal(httpStatus.unauthorized);
     expect(body).to.be.deep.equal({ message: 'Invalid email or password'});
   })
+  it.skip('Verifica se acessa a rota /login com sucesso', async function() {
+    req.body = loginMock;
+    sinon.stub(LoginModel.prototype, 'findOne').resolves(userMock);
+
+    const {status, body} = await chai.request(app).post('/login');
+    expect(status).to.be.equal(httpStatus.ok);
+    expect(body).to.be.deep.equal(tokenMock);
+  })
 
   it('Verifica se acessa a rota /matches com sucesso', async function() {
-
     sinon.stub(MatchesModel.prototype, 'findAll').resolves(AllMatchesMock);
 
     const {status, body} = await chai.request(app).get('/matches');

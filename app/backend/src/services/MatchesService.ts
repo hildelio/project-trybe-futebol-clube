@@ -80,18 +80,10 @@ export default class MatchesService {
   Promise<ServiceResponse<IMatches>> {
     try {
       const data = {
-        homeTeamId,
-        homeTeamGoals,
-        awayTeamId,
-        awayTeamGoals,
-        inProgress: true,
+        homeTeamId, homeTeamGoals, awayTeamId, awayTeamGoals, inProgress: true,
       };
       const newMatch = await this.matchesModel.create(data);
-      return {
-        type: httpStatus.created,
-        message: 'Created',
-        data: { value: newMatch },
-      };
+      return { type: httpStatus.created, message: 'Created', data: { value: newMatch } };
     } catch (error) {
       throw new CustomError('Error creating match', httpStatus.internalServerError);
     }

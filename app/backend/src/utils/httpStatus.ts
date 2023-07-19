@@ -6,6 +6,7 @@ const httpStatus = {
   unauthorized: 401,
   notFound: 404,
   conflict: 409,
+  unprocessableEntity: 422,
   internalServerError: 500,
 };
 
