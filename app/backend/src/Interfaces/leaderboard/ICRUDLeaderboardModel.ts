@@ -1,15 +1,14 @@
 import { CreateOptions } from 'sequelize';
-import { ID } from './index';
+import { ID } from '../index';
 
 export interface ICRUDModelCreator<T> {
   create(data: Partial<T>, options?: CreateOptions): Promise<T>,
 }
 
 export interface ICRUDModelReader<T> {
-  findAll?(): Promise<T[]>,
+  findAllTeamNames?(): Promise<T[]>,
   findById?(id: ID): Promise<T | null>,
   findOne?(email: string): Promise<T | null>,
-  count?(): Promise<number>,
 }
 
 export interface ICRUDModelUpdater<T> {

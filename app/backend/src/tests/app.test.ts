@@ -1,5 +1,7 @@
 import * as sinon from 'sinon';
 import * as chai from 'chai';
+import * as bcrypt from 'bcryptjs';
+
 // @ts-ignore
 import chaiHttp = require('chai-http');
 
@@ -13,9 +15,16 @@ import LoginModel from '../models/LoginModel';
 import httpStatus from '../utils/httpStatus';
 import MatchesModel from '../models/MatchesModel';
 import AllMatchesMock from './mocks/allMatchesMock';
-import loginMock from './mocks/loginMock';
+import { InvalidEmail, adminLogin, adminLoginBCrypt, invalidPassword } from './mocks/loginMock';
 import userMock from './mocks/userMock';
 import tokenMock from './mocks/tokenMock';
+import matchesInProgressTrueMock from './mocks/matchesInProgressTrueMock';
+import matchesInProgressFalseMock from './mocks/matchesInProgressTrueMock copy';
+import MatchMock from './mocks/matchMock';
+import SequelizeMatch from '../database/models/MatchModel';
+import SequelizeMatchExtended from '../Interfaces/leaderboard/SequelizeMatchExtended';
+import matchRequestUpdateMock from './mocks/matchRequestUpdateMock';
+import matchUpdatedMock from './mocks/matchUpdatedMock';
 
 chai.use(chaiHttp);
 
@@ -27,9 +36,6 @@ describe('Class App', () => {
   afterEach(() => {
     sinon.restore();
   })
-
-  const req = { body: {}};
-  const res = {};
 
   it('Verifica se existe a classe App', () => {
     expect(app).to.be.ok;
@@ -73,21 +79,53 @@ describe('Class App', () => {
     expect(body).to.be.deep.equal(teamMock);
   })
 
-  it.skip('Verifica se ao acessar a rota /login com email inválido retorna erro 401', async function() {
+  it('Verifica se ao acessar a rota /login com email inválido retorna erro 401', async function() {
 
     sinon.stub(LoginModel.prototype, 'findOne').resolves(null);
 
-    const {status, body} = await chai.request(app).get('/login');
+    const {status, body} = await chai.request(app).post('/login').send(InvalidEmail);
     expect(status).to.be.equal(httpStatus.unauthorized);
     expect(body).to.be.deep.equal({ message: 'Invalid email or password'});
   })
-  it.skip('Verifica se acessa a rota /login com sucesso', async function() {
-    req.body = loginMock;
+
+  it('Verifica se ao acessar a rota /login com senha inválida retorna erro 401', async function() {
+    sinon.stub(bcrypt, 'compareSync').returns(false);
     sinon.stub(LoginModel.prototype, 'findOne').resolves(userMock);
 
-    const {status, body} = await chai.request(app).post('/login');
+    const {status, body} = await chai.request(app).post('/login').send(invalidPassword);
+    expect(status).to.be.equal(httpStatus.unauthorized);
+    expect(body).to.be.deep.equal({ message: 'Invalid email or password'});
+  })
+
+  it('Verifica se acessa a rota /login com sucesso', async function() {
+    sinon.stub(bcrypt, 'compareSync').returns(true);
+    sinon.stub(LoginModel.prototype, 'findOne').resolves(userMock);
+
+    const {status, body} = await chai.request(app).post('/login').send(adminLogin);
     expect(status).to.be.equal(httpStatus.ok);
-    expect(body).to.be.deep.equal(tokenMock);
+    expect(body).to.haveOwnProperty('token');
+  })
+
+  it('Verifica se acessa a rota /login/role com sucesso', async function() {
+    sinon.stub(bcrypt, 'compareSync').returns(true);
+    sinon.stub(LoginModel.prototype, 'findOne').resolves(userMock);
+
+    const token = await chai.request(app).post('/login').send(adminLogin);
+
+    const {status, body} = await chai
+      .request(app)
+      .get('/login/role')
+      .set('Authorization', 'Bearer ' + token.body.token);
+    expect(status).to.be.equal(httpStatus.ok);
+    expect(body).to.be.deep.equal({ role: 'admin' });
+  })
+
+  it('Verifica se ao acessa a rota /matches recebe "Matches not found"', async function() {
+    sinon.stub(MatchesModel.prototype, 'findAll').resolves(undefined);
+
+    const {status, body} = await chai.request(app).get('/matches');
+    expect(status).to.be.equal(httpStatus.notFound);
+    expect(body).to.be.deep.equal({ message: 'Matches not found' });
   })
 
   it('Verifica se acessa a rota /matches com sucesso', async function() {
@@ -96,5 +134,57 @@ describe('Class App', () => {
     const {status, body} = await chai.request(app).get('/matches');
     expect(status).to.be.equal(httpStatus.ok);
     expect(body).to.be.deep.equal(AllMatchesMock);
+  })
+
+  it('Verifica se acessa a rota /matches/inProgress=true com sucesso', async function() {
+    sinon.stub(MatchesModel.prototype, 'findAll').resolves(matchesInProgressTrueMock);
+
+    const {status, body} = await chai.request(app).get('/matches/?inProgress=true');
+    expect(status).to.be.equal(httpStatus.ok);
+    expect(body).to.be.deep.equal(matchesInProgressTrueMock);
+  })
+
+  it('Verifica se acessa a rota /matches/inProgress=false com sucesso', async function() {
+    sinon.stub(MatchesModel.prototype, 'findAll').resolves(matchesInProgressFalseMock);
+
+    const {status, body} = await chai.request(app).get('/matches/?inProgress=false');
+    expect(status).to.be.equal(httpStatus.ok);
+    expect(body).to.be.deep.equal(matchesInProgressFalseMock);
+  })
+
+  it.skip('Verifica se acessa a rota /matches/:id/finish com sucesso', async function() {
+    sinon.stub(MatchesModel.prototype, 'findById').resolves(null);
+
+    const {status, body} = await chai.request(app).patch('/matches/1/finish');
+    expect(status).to.be.equal(httpStatus.notFound);
+    expect(body).to.be.deep.equal({ message: 'Match not found' });
+  })
+
+  it.skip('Verifica se acessa a rota /matches/:id/finish com sucesso', async function() {
+    sinon.stub(MatchesModel.prototype, 'findById').resolves(MatchMock as unknown as SequelizeMatch);
+
+    const {status, body} = await chai.request(app).patch('/matches/1/finish');
+    expect(status).to.be.equal(httpStatus.ok);
+    expect(body).to.be.deep.equal('Finished');
+  })
+  it.skip('Verifica se acessa a rota /matches/:id com sucesso', async function() {
+    sinon.stub(bcrypt, 'compareSync').returns(true);
+    const matchToUpdate = MatchMock as unknown as SequelizeMatch;
+    sinon.stub(MatchesModel.prototype, 'findById').resolves(matchToUpdate);
+
+    sinon.stub(matchToUpdate, 'save').resolves(matchUpdatedMock as unknown as SequelizeMatch)
+    
+    const tokenResponse = await chai.request(app).post('/login').send(adminLoginBCrypt);
+
+    const token = tokenResponse.body.token;
+
+    const {status, body} = await chai
+      .request(app)
+      .patch('/matches/1')
+      .set('Authorization', 'Bearer ' + token)
+      .send(matchRequestUpdateMock)
+
+      expect(status).to.be.equal(httpStatus.ok);
+      expect(body).to.be.deep.equal(matchUpdatedMock);
   })
 });

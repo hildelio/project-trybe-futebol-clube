@@ -26,4 +26,13 @@ export default class MatchesModel implements IMatchesModel {
       throw new CustomError('Error creating match model', httpStatus.internalServerError);
     }
   }
+
+  async count(): Promise<number> {
+    const count = await this.model.count();
+    return count;
+  }
+
+  getModel(): typeof SequelizeMatch {
+    return this.model;
+  }
 }
