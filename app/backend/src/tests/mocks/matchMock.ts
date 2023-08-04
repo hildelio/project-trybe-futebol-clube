@@ -1,12 +1,12 @@
 import IMatches from "../../Interfaces/matches/IMatches";
 
-const MatchMock = {
+const MatchMock: IMatches = {
   "id": 1,
   "homeTeamId": 16,
   "homeTeamGoals": 1,
   "awayTeamId": 8,
   "awayTeamGoals": 1,
-  "inProgress": false,
+  "inProgress": true,
   "homeTeam": {
     "teamName": "São Paulo"
   },

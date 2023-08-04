@@ -1,5 +1,7 @@
 import * as sinon from 'sinon';
 import * as chai from 'chai';
+// import * as chaiSpies from 'chai-spies';
+
 import * as bcrypt from 'bcryptjs';
 
 // @ts-ignore
@@ -27,6 +29,7 @@ import matchRequestUpdateMock from './mocks/matchRequestUpdateMock';
 import matchUpdatedMock from './mocks/matchUpdatedMock';
 
 chai.use(chaiHttp);
+// chai.use(chaiSpies);
 
 const { expect } = chai;
 
@@ -44,6 +47,19 @@ describe('Class App', () => {
   it('Verifica se existe o método start', () => {
     expect(start).to.be.ok;
   })
+
+  // it.skip('Verifica se o método start configura a porta corretamente', () => {
+  //   const app = new App();
+  //   const PORT = 3001;
+
+  //   chai-spyOn(console, 'log');
+
+  //   app.start(PORT);
+    
+    
+  //   expect(app['app'].listen).to.have.been.called.with(PORT);
+  // });
+  
 
   it('Verifica se ao acessar a rota /teams deve retornar 404 em caso de erro', async function() {
     sinon.stub(TeamsModel.prototype, 'findAll').resolves(undefined);
@@ -152,29 +168,99 @@ describe('Class App', () => {
     expect(body).to.be.deep.equal(matchesInProgressFalseMock);
   })
 
-  it.skip('Verifica se acessa a rota /matches/:id/finish com sucesso', async function() {
-    sinon.stub(MatchesModel.prototype, 'findById').resolves(null);
-
-    const {status, body} = await chai.request(app).patch('/matches/1/finish');
-    expect(status).to.be.equal(httpStatus.notFound);
-    expect(body).to.be.deep.equal({ message: 'Match not found' });
-  })
-
-  it.skip('Verifica se acessa a rota /matches/:id/finish com sucesso', async function() {
-    sinon.stub(MatchesModel.prototype, 'findById').resolves(MatchMock as unknown as SequelizeMatch);
-
-    const {status, body} = await chai.request(app).patch('/matches/1/finish');
-    expect(status).to.be.equal(httpStatus.ok);
-    expect(body).to.be.deep.equal('Finished');
-  })
-  it.skip('Verifica se acessa a rota /matches/:id com sucesso', async function() {
+  it('Verifica se ao acessar a rota /matches/:id/finish recebe  "Match not found', async function() {
     sinon.stub(bcrypt, 'compareSync').returns(true);
-    const matchToUpdate = MatchMock as unknown as SequelizeMatch;
-    sinon.stub(MatchesModel.prototype, 'findById').resolves(matchToUpdate);
+    const matchToUpdate: SequelizeMatch = new SequelizeMatch();    
 
-    sinon.stub(matchToUpdate, 'save').resolves(matchUpdatedMock as unknown as SequelizeMatch)
+    matchToUpdate.id = 1;
+    matchToUpdate.homeTeamId = 16;
+    matchToUpdate.awayTeamId = 8;
     
-    const tokenResponse = await chai.request(app).post('/login').send(adminLoginBCrypt);
+    sinon.stub(MatchesModel.prototype, 'findById').resolves(null);
+    matchToUpdate.inProgress = false;
+    
+    sinon.stub(matchToUpdate, 'save').resolves(matchUpdatedMock as SequelizeMatch)
+    
+    const tokenResponse = await chai.request(app).post('/login').send(adminLogin);
+
+    const token = tokenResponse.body.token;
+
+    const {status, body} = await chai
+      .request(app)
+      .patch('/matches/1/finish')
+      .set('Authorization', 'Bearer ' + token)
+
+      expect(status).to.be.equal(httpStatus.notFound);
+      expect(body).to.be.deep.equal({ message: 'Match not found'});
+  })
+
+  it('Verifica se acessa a rota /matches/:id/finish com sucesso', async function() {
+    sinon.stub(bcrypt, 'compareSync').returns(true);
+    const matchToUpdate: SequelizeMatch = new SequelizeMatch();    
+
+    matchToUpdate.id = 1;
+    matchToUpdate.homeTeamId = 16;
+    matchToUpdate.awayTeamId = 8;
+    
+    sinon.stub(MatchesModel.prototype, 'findById').resolves(matchToUpdate);
+    matchToUpdate.inProgress = false;
+    
+    sinon.stub(matchToUpdate, 'save').resolves(matchUpdatedMock as SequelizeMatch)
+    
+    const tokenResponse = await chai.request(app).post('/login').send(adminLogin);
+
+    const token = tokenResponse.body.token;
+
+    const {status, body} = await chai
+      .request(app)
+      .patch('/matches/1/finish')
+      .set('Authorization', 'Bearer ' + token)
+
+      expect(status).to.be.equal(httpStatus.ok);
+      expect(body).to.be.deep.equal('Finished');
+  })
+
+  it('Verifica se ao acessar a rota /matches/:id recebe "Match not found"', async function() {
+    sinon.stub(bcrypt, 'compareSync').returns(true);
+    const matchToUpdate: SequelizeMatch = new SequelizeMatch();    
+
+    matchToUpdate.id = 1;
+    matchToUpdate.homeTeamId = 16;
+    matchToUpdate.awayTeamId = 8;
+    
+    sinon.stub(MatchesModel.prototype, 'findById').resolves(null);
+    matchToUpdate.inProgress = false;
+    
+    sinon.stub(matchToUpdate, 'save').resolves(matchUpdatedMock as SequelizeMatch)
+    
+    const tokenResponse = await chai.request(app).post('/login').send(adminLogin);
+
+    const token = tokenResponse.body.token;
+
+    const {status, body} = await chai
+      .request(app)
+      .patch('/matches/1')
+      .set('Authorization', 'Bearer ' + token)
+      .send(matchRequestUpdateMock)
+
+      expect(status).to.be.equal(httpStatus.notFound);
+      expect(body).to.be.deep.equal({ message: 'Match not found'});
+  })
+
+  it('Verifica se acessa a rota /matches/:id com sucesso', async function() {
+    sinon.stub(bcrypt, 'compareSync').returns(true);
+    const matchToUpdate: SequelizeMatch = new SequelizeMatch();    
+
+    matchToUpdate.id = 1;
+    matchToUpdate.homeTeamId = 16;
+    matchToUpdate.awayTeamId = 8;
+    
+    sinon.stub(MatchesModel.prototype, 'findById').resolves(matchToUpdate);
+    matchToUpdate.inProgress = false;
+    
+    sinon.stub(matchToUpdate, 'save').resolves(matchUpdatedMock as SequelizeMatch)
+    
+    const tokenResponse = await chai.request(app).post('/login').send(adminLogin);
 
     const token = tokenResponse.body.token;
 
@@ -186,5 +272,12 @@ describe('Class App', () => {
 
       expect(status).to.be.equal(httpStatus.ok);
       expect(body).to.be.deep.equal(matchUpdatedMock);
+  })
+
+  it.only('Verifica se acessa a rota /leaderboard/home com sucesso', async function() {
+    const {status, body} = await chai.request(app).get('/leaderboard/home');
+
+    expect(status).to.be.equal(httpStatus.ok);
+    expect(body).to.be.deep.equal(MatchMock);
   })
 });
